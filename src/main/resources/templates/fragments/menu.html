@@ -1,0 +1,16 @@
+<div class="ui padded basic segment" data-th-fragment="top_menu(activeMenu)">
+  <div class="ui large secondary pointing menu">
+    <a class="item" data-th-href="@{/}" data-th-classappend="${(activeMenu eq 'home') ? 'active' : ''}">Home</a>
+    <a class="item" data-th-href="@{/user}" data-sec-authorize="isAuthenticated()" data-th-classappend="${(activeMenu eq 'user') ? 'active' : ''}">User</a>
+
+    <div class="center aligned header item">
+      <h1 style="color:#50b33a">Spring social 2 cloud</h1>
+    </div>
+
+    <div class="right item" style="margin-left: 0% !important;">
+      <a class="ui secondary basic button" style="margin-right: 1em" data-th-href="@{/login}" data-sec-authorize="!isAuthenticated()">Log in</a>
+      <a class="ui secondary basic button" style="margin-right: 1em" data-th-href="@{/logout}" data-sec-authorize="isAuthenticated()">Log out</a>
+      <a class="ui secondary basic disabled button" data-sec-authorize="!isAuthenticated()">Sign up</a>
+    </div>
+  </div>
+</div>

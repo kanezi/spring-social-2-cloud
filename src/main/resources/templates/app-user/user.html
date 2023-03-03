@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{fragments/skeleton::layout('user', ~{::#user_segment})}">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+</head>
+<body>
+<div class="ui grid segment" id="user_segment">
+    <div class="four wide left attached column">
+        <div class="ui vertical fluid tabular menu">
+            <a class="active item" data-tab="user">
+                Info
+            </a>
+            <a class="item" data-tab="change_password">
+                Password
+            </a>
+        </div>
+    </div>
+    <div class="twelve wide stretched right attached column">
+        <div class="ui seamless right attached active tab segment" data-tab="user">
+
+            <div class="ui card">
+                <div class="image">
+
+                     <img data-th-if="${appUser.imageUrl}" data-th-src="${appUser.imageUrl}">
+
+                    <img data-th-unless="${appUser.imageUrl}" class="ui small circular image" data-th-src="@{/images/square-image.png}">
+                </div>
+                <div class="content">
+                    <a class="header" data-th-text="${appUser.username}">username</a>
+                    <div class="description">
+                        Joined via <span data-th-text="${appUser.provider}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui seamless right attached tab segment" data-tab="change_password">
+            <div class="ui inverted segment">
+                <h4 class="">Change password</h4>
+                <form class="ui inverted form" id="change_password_form">
+                    <div class="field">
+                        <label>Password</label>
+                        <input placeholder="password" type="password" name="password" autocomplete="off" autofocus="">
+                    </div>
+                    <div class="field">
+                        <label>Confirm password</label>
+                        <input placeholder="confirm password" type="password" name="confirm_password"
+                               autocomplete="off">
+                    </div>
+                    <div class="ui error message"></div>
+
+                    <div class="field">
+                        <input class="ui inverted submit button" type="submit" value="Change password"/>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <script>
+                        $('#change_password_form')
+                            .form({
+                                fields: {
+                                    password: {
+                                        identifier: 'password',
+                                        rules: [
+                                            {
+                                                type: 'empty',
+                                                prompt: 'Please enter your password'
+                                            },
+                                            {
+                                                type: 'length[6]',
+                                                prompt: 'Your password must be at least 6 characters'
+                                            }
+                                        ]
+                                    }
+                                    ,
+                                    confirm_password: {
+                                        identifier: 'confirm_password',
+                                        rules: [
+                                            {
+                                                type: 'match[password]',
+                                                prompt: 'Your passwords do not match'
+                                            }
+                                        ]
+                                    }
+                                }
+                            })
+                            ;
+
+            </script>
+
+
+        </div>
+    </div>
+    <script>
+            $().ready(function () {
+                $('#user_segment .menu .item').tab();
+            });
+
+
+    </script>
+</div>
+</body>
+</html>

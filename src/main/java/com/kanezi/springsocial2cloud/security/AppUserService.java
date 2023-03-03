@@ -42,12 +42,14 @@ public class AppUserService implements UserDetailsService {
     private void createHardcodedUsers() {
         var bob = AppUser.builder()
                 .username("bob")
+                .provider(LoginProvider.APP)
                 .password(passwordEncoder.encode("1234"))
                 .authorities(List.of(new SimpleGrantedAuthority("read")))
                 .build();
 
         var bil = AppUser.builder()
                 .username("bil")
+                .provider(LoginProvider.APP)
                 .password(passwordEncoder.encode("321"))
                 .authorities(List.of(new SimpleGrantedAuthority("read")))
                 .build();
