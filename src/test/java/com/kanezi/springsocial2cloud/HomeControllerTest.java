@@ -7,7 +7,12 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
@@ -25,7 +30,10 @@ class HomeControllerTest {
     @Test
     @WithAnonymousUser
     void anonymousUserIsNotAllowedToSeeHomePage() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().stringValues("Location", "http://localhost/login"))
+        ;
     }
 
 }

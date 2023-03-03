@@ -2,8 +2,8 @@ package com.kanezi.springsocial2cloud.security;
 
 import jakarta.annotation.PostConstruct;
 import lombok.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +17,10 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Value
@@ -26,6 +29,8 @@ public class AppUserService implements UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     Map<String, AppUser> users = new HashMap<>();
+    DefaultOAuth2UserService oauth2Delegate = new DefaultOAuth2UserService();
+    OidcUserService oidcDelegate = new OidcUserService();
 
 
     @Override
@@ -52,12 +57,15 @@ public class AppUserService implements UserDetailsService {
 
     }
 
-    OAuth2UserService<OidcUserRequest, OidcUser> oidcLoginHandler() {
+    /**
+     * Adapts oidc login to return AppUser instead of default OidcUser
+     * @return service that returns AppUser from request to the Oidc UserInfo Endpoint
+     */
+    @Bean
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcLoginHandler() {
         return userRequest -> {
             LoginProvider provider = getProvider(userRequest);
-            OidcUserService delegate = new OidcUserService();
-            //
-            OidcUser oidcUser = delegate.loadUser(userRequest);
+            OidcUser oidcUser = oidcDelegate.loadUser(userRequest);
             return AppUser
                     .builder()
                     .provider(provider)
@@ -73,11 +81,15 @@ public class AppUserService implements UserDetailsService {
         };
     }
 
-    OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2LoginHandler() {
+    /**
+     * Adapts oauth2 login to return AppUser instead of default OAauth2User
+     * @return service that returns AppUser from request to the Oauth2 user info
+     */
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2LoginHandler() {
         return userRequest -> {
             LoginProvider provider = getProvider(userRequest);
-            DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-            OAuth2User oAuth2User = delegate.loadUser(userRequest);
+            OAuth2User oAuth2User = oauth2Delegate.loadUser(userRequest);
             return AppUser
                     .builder()
                     .provider(provider)
