@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{fragments/skeleton::layout('home', ~{::login_fragment})}">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+
+
+<div class="ui container" data-th-fragment="login_fragment">
+  <style type="text/css">
+            .column {
+                max-width: 450px;
+            }
+    </style>
+  <div class="ui middle aligned center aligned grid">
+    <div class="column">
+      <div class="ui segment container">
+        <h2 class="ui image header">
+          <!-- <img src="assets/images/logo.png" class="image"> -->
+          <div class="content">
+            Log-in to your account
+          </div>
+        </h2>
+
+        <form class="ui large form" data-th-action="@{/authenticate}" method="post">
+          <div class="ui segment">
+            <div class="field">
+              <div class="ui left icon inverted input">
+                <i class="user icon"></i>
+                <input type="text" name="user" placeholder="Userename" class="inverted input"
+                       autocomplete="off" autofocus="">
+              </div>
+            </div>
+            <div class="field">
+              <div class="ui left icon input">
+                <i class="lock icon"></i>
+                <input type="password" name="pass" placeholder="Password">
+              </div>
+            </div>
+            <div class="ui fluid large secondary submit button">Login</div>
+          </div>
+
+          <div class="ui error message"></div>
+
+        </form>
+
+        <div class="ui horizontal divider">
+          Or
+        </div>
+
+        <div class="ui basic segment fluid container">
+          <div class="ui vertical fluid wrapping spaced buttons">
+            <a class="ui fluid large basic secondary button" data-th-href="@{/oauth2/authorization/google}">
+              <i class="google icon"></i>
+              Sign in via Google
+            </a>
+            <a class="ui fluid large basic secondary button" data-th-href="@{/oauth2/authorization/github}">
+              <i class="github icon"></i>
+              Sign in via Github
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="ui message">
+        New to us? <a href="#">Sign Up</a>
+      </div>
+    </div>
+  </div>
+  <script>
+            $(document)
+                .ready(function () {
+                    $('.ui.form')
+                        .form({
+                            fields: {
+                                username: {
+                                    identifier: 'user',
+                                    rules: [
+                                        {
+                                            type: 'empty',
+                                            prompt: 'Please enter your username'
+                                        },
+                                        /*    {
+                                               type: 'email',
+                                               prompt: 'Please enter a valid e-mail'
+                                           } */
+                                    ]
+                                },
+                                password: {
+                                    identifier: 'pass',
+                                    rules: [
+                                        {
+                                            type: 'empty',
+                                            prompt: 'Please enter your password'
+                                        },
+                                        {
+                                            type: 'length[6]',
+                                            prompt: 'Your password must be at least 6 characters'
+                                        }
+                                    ]
+                                }
+                            }
+                        })
+                        ;
+                })
+                ;
+
+    </script>
+</div>
+</body>
+</html>

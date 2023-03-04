@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -43,10 +41,16 @@ public class SecurityConfiguration {
                                             OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2LoginHandler,
                                             OAuth2UserService<OidcUserRequest, OidcUser> oidcLoginHandler) throws Exception {
         return http
-                .formLogin(withDefaults())
-                .oauth2Login(oc -> oc.userInfoEndpoint(ui -> ui.userService(oauth2LoginHandler).oidcUserService(oidcLoginHandler)))
+                .formLogin(c -> c.loginPage("/login")
+                        .loginProcessingUrl("/authenticate")
+                        .usernameParameter("user")
+                        .passwordParameter("pass")
+                        .defaultSuccessUrl("/user")
+                )
+                .logout(c -> c.logoutSuccessUrl("/?logout"))
+                .oauth2Login(oc -> oc.loginPage("/login").defaultSuccessUrl("/user").userInfoEndpoint(ui -> ui.userService(oauth2LoginHandler).oidcUserService(oidcLoginHandler)))
                 .authorizeHttpRequests(c -> c
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
