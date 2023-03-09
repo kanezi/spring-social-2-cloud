@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,16 +16,14 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Value
-public class AppUserService implements UserDetailsService {
+public class AppUserService implements UserDetailsManager {
 
     PasswordEncoder passwordEncoder;
 
@@ -112,5 +111,53 @@ public class AppUserService implements UserDetailsService {
 
     private void createUser(AppUser user) {
         users.putIfAbsent(user.getUsername(), user);
+    }
+
+    public void createUser(String username, String password) {
+        createUser(User
+                .builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .authorities(Collections.emptyList())
+                .build());
+    }
+
+    @Override
+    public void createUser(UserDetails user) {
+
+        if (userExists(user.getUsername())) {
+            throw new IllegalArgumentException(String.format("User %s already exists!", user.getUsername()));
+        }
+
+        createUser(AppUser
+                .builder()
+                .provider(LoginProvider.APP)
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .authorities(user.getAuthorities())
+                .build());
+    }
+
+    @Override
+    public void updateUser(UserDetails user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteUser(String username) {
+        if (userExists(username)) {
+            users.remove(username);
+        }
+    }
+
+    @Override
+    public void changePassword(String oldPassword, String newPassword) {
+
+
+    }
+
+    @Override
+    public boolean userExists(String username) {
+        return users.containsKey(username);
     }
 }

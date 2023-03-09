@@ -11,7 +11,7 @@
       <a class="ui secondary basic button" style="margin-right: 1em" data-th-href="@{/login}" data-sec-authorize="!isAuthenticated()">Log in</a>
       <a class="ui secondary basic button" data-th-attr="onclick=|$('#logout_form').submit();|" data-sec-authorize="isAuthenticated()">Log out</a>
       <form id="logout_form" data-th-action="@{/logout}" method="post"></form>
-      <a class="ui secondary basic disabled button" data-sec-authorize="!isAuthenticated()">Sign up</a>
+      <a class="ui secondary basic button" data-sec-authorize="!isAuthenticated()" data-th-href="@{/user/sign-up}">Sign up</a>
     </div>
   </div>
 </div>

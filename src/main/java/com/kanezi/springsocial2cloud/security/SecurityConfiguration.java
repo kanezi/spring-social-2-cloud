@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                 .logout(c -> c.logoutSuccessUrl("/?logout"))
                 .oauth2Login(oc -> oc.loginPage("/login").defaultSuccessUrl("/user").userInfoEndpoint(ui -> ui.userService(oauth2LoginHandler).oidcUserService(oidcLoginHandler)))
                 .authorizeHttpRequests(c -> c
-                        .requestMatchers("/", "/login").permitAll()
+                        .requestMatchers("/", "/login", "/user/sign-up", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();

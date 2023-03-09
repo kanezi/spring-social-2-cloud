@@ -7,7 +7,7 @@
     <!-- You MUST include jQuery 3+ before Fomantic -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.css">
-    <link rel="stylesheet" type="text/css" data-th-href="@{app.css}">
+    <link rel="stylesheet" type="text/css" data-th-href="@{/app.css}">
     <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.9.2/dist/semantic.min.js"></script>
 
 </head>
@@ -17,6 +17,16 @@
     <div data-th-replace="~{fragments/menu::top_menu(${activeMenu})}"></div>
     <!--  CONTENT-->
     <div data-th-insert="${content}"></div>
+
+    <script data-th-if="${toast}" data-th-inline="javascript">
+        $.toast({
+            title: /*[[${toast.title}]]*/'',
+            message: /*[[${toast.message}]]*/'',
+            class: /*[[${toast.clazz}]]*/''
+        })
+        ;
+
+    </script>
 
 </div>
 </body>

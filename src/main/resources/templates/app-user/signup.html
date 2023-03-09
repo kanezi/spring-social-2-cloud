@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{fragments/skeleton::layout('home', ~{::signup_fragment})}">
+<head>
+    <meta charset="UTF-8">
+    <title>SignUp</title>
+</head>
+<body>
+<div data-th-fragment="signup_fragment">
+  <script>
+        $(document)
+            .ready(function () {
+                $('.ui.form')
+                    .form({
+                        fields: {
+                            username: {
+                                identifier: 'username',
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Please enter your username'
+                                    }
+                                ]
+                            },
+/*                             email: {
+                                identifier: 'email',
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Please enter your email'
+                                    },
+                                    {
+                                        type: 'email',
+                                        prompt: 'Please enter a valid e-mail'
+                                    }
+                                ]
+                            }, */
+                            password: {
+                                identifier: 'password',
+                                rules: [
+                                    {
+                                        type: 'empty',
+                                        prompt: 'Please enter your password'
+                                    },
+                                    {
+                                        type: 'length[3]',
+                                        prompt: 'Your password must be at least 3 characters'
+                                    }
+                                ]
+                            }
+                        }
+                    })
+                    ;
+            })
+            ;
+
+    </script>
+  <div class="ui middle aligned center aligned grid">
+
+    <div class="column">
+      <div class="ui segment container">
+        <h2 class="ui image header">
+          <div class="content">
+            Create a New Account
+          </div>
+        </h2>
+
+
+        <form class="ui large form"
+              method="post"
+              data-th-action="@{/user/sign-up}"
+              data-th-object="${signUpForm}"
+              data-th-classappend="${#fields.hasAnyErrors() ? 'error' : ''}"
+        >
+          <div class="ui segment">
+            <div class="field" data-th-classappend="${#fields.hasErrors('username') ? 'error' : ''}">
+              <div class="ui left icon inverted input">
+                <i class="user icon"></i>
+                <input type="text" placeholder="Userename" autofocus="" autocomplete="off" data-th-field="*{username}"/>
+              </div>
+              <div data-th-if="${#fields.hasErrors('username')}" class="ui basic red pointing prompt fluid label">
+                <p data-th-errors="*{username}"></p>
+              </div>
+            </div>
+            <!-- <div class="field">
+                <div class="ui left icon inverted input">
+                    <i class="at icon"></i>
+                    <input type="text" id="email" name="email" placeholder="Email" required=""
+                        autocomplete="off" />
+                </div>
+            </div> -->
+            <div class="field" data-th-classappend="${#fields.hasErrors('password') ? 'error' : ''}">
+              <div class="ui left icon input">
+                <i class="lock icon"></i>
+                <input type="password" placeholder="Password" data-th-field="*{password}"/>
+              </div>
+              <div data-th-if="${#fields.hasErrors('password')}" class="ui basic red pointing prompt fluid label">
+                <p data-th-errors="*{password}"></p>
+              </div>
+            </div>
+            <div class="field">
+              <input class="ui fluid large secondary submit button" value="Sign up" type="submit"/>
+            </div>
+          </div>
+
+          <div class="ui error message" data-th-unless="${#fields.hasAnyErrors()}">
+          </div>
+
+        </form>
+
+
+      </div>
+
+    </div>
+  </div>
+
+  <style type="text/css">
+        body>.grid {
+            height: 100%;
+        }
+
+        .column {
+            max-width: 450px;
+        }
+
+    </style>
+</div>
+</body>
+</html>
