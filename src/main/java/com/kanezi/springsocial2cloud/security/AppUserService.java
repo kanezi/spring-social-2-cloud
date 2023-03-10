@@ -3,7 +3,9 @@ package com.kanezi.springsocial2cloud.security;
 import jakarta.annotation.PostConstruct;
 import lombok.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -60,6 +62,7 @@ public class AppUserService implements UserDetailsManager {
 
     /**
      * Adapts oidc login to return AppUser instead of default OidcUser
+     *
      * @return service that returns AppUser from request to the Oidc UserInfo Endpoint
      */
     @Bean
@@ -84,6 +87,7 @@ public class AppUserService implements UserDetailsManager {
 
     /**
      * Adapts oauth2 login to return AppUser instead of default OAauth2User
+     *
      * @return service that returns AppUser from request to the Oauth2 user info
      */
     @Bean
@@ -152,7 +156,15 @@ public class AppUserService implements UserDetailsManager {
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        AppUser currentUser = (AppUser) authentication.getPrincipal();
+
+        if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
+            throw new IllegalArgumentException("Old password is not correct!");
+        }
+
+        users.get(currentUser.getUsername()).setPassword(passwordEncoder.encode(newPassword));
 
     }
 

@@ -8,16 +8,16 @@
 <div class="ui grid segment" id="user_segment">
     <div class="four wide left attached column">
         <div class="ui vertical fluid tabular menu">
-            <a class="active item" data-tab="user">
+            <a class="item" data-tab="user" data-th-classappend="${(tab eq 'user') ? 'active' : ''}">
                 Info
             </a>
-            <a class="item" data-tab="change_password">
+            <a class="item" data-tab="change_password" data-th-classappend="${(tab eq 'pass') ? 'active' : ''}">
                 Password
             </a>
         </div>
     </div>
     <div class="twelve wide stretched right attached column">
-        <div class="ui seamless right attached active tab segment" data-tab="user">
+        <div class="ui seamless right attached tab segment" data-tab="user" data-th-classappend="${(tab eq 'user') ? 'active' : ''}">
 
             <div class="ui card">
                 <div class="image">
@@ -35,20 +35,49 @@
             </div>
         </div>
 
-        <div class="ui seamless right attached tab segment" data-tab="change_password">
+        <div class="ui seamless right attached tab segment" data-tab="change_password" data-th-classappend="${(tab eq 'pass') ? 'active' : ''}">
             <div class="ui inverted segment">
                 <h4 class="">Change password</h4>
-                <form class="ui inverted form" id="change_password_form">
-                    <div class="field">
+                <form class="ui inverted form" id="change_password_form"
+                      method="post"
+                      data-th-action="@{/user/password}"
+                      data-th-object="${changePasswordForm}"
+                      data-th-classappend="${#fields.hasAnyErrors() ? 'error' : ''}"
+                >
+                    <input type="hidden" name="_method" value="PATCH">
+                    <div class="field" data-th-classappend="${#fields.hasErrors('oldPassword') ? 'error' : ''}">
+                        <label>Old password</label>
+                        <input data-th-field="*{oldPassword}" placeholder="old password" type="password" name="old_password" autocomplete="off" autofocus="">
+                        <div data-th-if="${#fields.hasErrors('oldPassword')}" class="ui basic red pointing prompt fluid label">
+                            <p data-th-errors="*{oldPassword}"></p>
+                        </div>
+
+                    </div>
+
+                    <div class="field" data-th-classappend="${#fields.hasErrors('password') ? 'error' : ''}">
                         <label>Password</label>
-                        <input placeholder="password" type="password" name="password" autocomplete="off" autofocus="">
+                        <input data-th-field="*{password}" placeholder="password" type="password" name="password" autocomplete="off" autofocus="">
+
+                        <div data-th-if="${#fields.hasErrors('password')}" class="ui basic red pointing prompt fluid label">
+                            <p data-th-errors="*{password}"></p>
+                        </div>
                     </div>
-                    <div class="field">
+                    <div class="field" data-th-classappend="${#fields.hasErrors('passwordConfirm') ? 'error' : ''}">
                         <label>Confirm password</label>
-                        <input placeholder="confirm password" type="password" name="confirm_password"
+                        <input data-th-field="*{passwordConfirm}" placeholder="confirm password" type="password" name="confirm_password"
                                autocomplete="off">
+
+                        <div data-th-if="${#fields.hasErrors('passwordConfirm')}" class="ui basic red pointing prompt fluid label">
+                            <p data-th-errors="*{passwordConfirm}"></p>
+                        </div>
                     </div>
-                    <div class="ui error message"></div>
+                    <div class="ui error message">
+
+                        <div data-th-if="${#fields.hasErrors('samePassword')}">
+                            <p data-th-errors="*{samePassword}"></p>
+                        </div>
+
+                    </div>
 
                     <div class="field">
                         <input class="ui inverted submit button" type="submit" value="Change password"/>
