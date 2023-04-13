@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgres:13
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: ${DB_SCHEMA:-ss2c}
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASS:-pass}
