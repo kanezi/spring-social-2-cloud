@@ -21,10 +21,10 @@ Prerequisites for developing / running app locally (__checked__ are mandatory)
 To start application locally, run following commands from the root of the project:
 
 > 1. start required auxiliary services  
-> **docker compose up -d**
+> **```docker compose up -d```**
 
 > 2. run spring application using spring-boot runner  
-> **./mvnw spring-boot:run**
+> **```./mvnw spring-boot:run```**
 
 > 3. access the app at:  
 > ***http://localhost:8080***
@@ -35,13 +35,13 @@ To use Google and Github log in locally / in cloud, you'll have to register oaut
 
 You'll be given **CLIENT_ID** and **CLIENT_SECRET** which you'll need to place in your **environment variables**:
 
-GOOGLE
-: GOOGLE_CLIENT_ID
-: GOOGLE_CLIENT_SECRET
+**GOOGLE**
+* ```GOOGLE_CLIENT_ID```
+* ```GOOGLE_CLIENT_SECRET```
 
-GITHUB
-: GITHUB_CLIENT_ID
-: GITHUB_CLIENT_SECRET
+**GITHUB**
+* ```GITHUB_CLIENT_ID```
+* ```GITHUB_CLIENT_SECRET```
 
 Application will automatically pick up and use given values.
 
