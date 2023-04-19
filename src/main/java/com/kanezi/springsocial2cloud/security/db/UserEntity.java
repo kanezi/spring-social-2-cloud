@@ -1,4 +1,4 @@
-package com.kanezi.springsocial2cloud.security.data;
+package com.kanezi.springsocial2cloud.security.db;
 
 import com.kanezi.springsocial2cloud.security.LoginProvider;
 import jakarta.persistence.*;

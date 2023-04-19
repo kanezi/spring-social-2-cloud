@@ -1,12 +1,12 @@
 package com.kanezi.springsocial2cloud.security;
 
-import com.kanezi.springsocial2cloud.security.data.AuthorityEntity;
-import com.kanezi.springsocial2cloud.security.data.AuthorityEntityRepository;
-import com.kanezi.springsocial2cloud.security.data.UserEntity;
-import com.kanezi.springsocial2cloud.security.data.UserEntityRepository;
+import com.kanezi.springsocial2cloud.security.db.AuthorityEntity;
+import com.kanezi.springsocial2cloud.security.db.AuthorityEntityRepository;
+import com.kanezi.springsocial2cloud.security.db.UserEntity;
+import com.kanezi.springsocial2cloud.security.db.UserEntityRepository;
 import jakarta.transaction.Transactional;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
+import lombok.experimental.NonFinal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,19 +32,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Service
-@Data
-@RequiredArgsConstructor
+@Value
+@NonFinal
 public class AppUserService implements UserDetailsManager {
 
-    private final PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
-    private final DefaultOAuth2UserService oauth2Delegate = new DefaultOAuth2UserService();
-    private final OidcUserService oidcDelegate = new OidcUserService();
+    DefaultOAuth2UserService oauth2Delegate = new DefaultOAuth2UserService();
+    OidcUserService oidcDelegate = new OidcUserService();
 
-    private final UserEntityRepository userEntityRepository;
-    private final AuthorityEntityRepository authorityEntityRepository;
+    UserEntityRepository userEntityRepository;
+    AuthorityEntityRepository authorityEntityRepository;
 
-    private final Executor executor;
+    Executor executor;
 
     @Override
     @Transactional
@@ -217,7 +217,7 @@ public class AppUserService implements UserDetailsManager {
     public void changePassword(String oldPassword, String newPassword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        AppUser currentUser = (AppUser) authentication.getPrincipal();
+        UserDetails currentUser = (UserDetails) authentication.getPrincipal();
 
         if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
             throw new IllegalArgumentException("Old password is not correct!");
