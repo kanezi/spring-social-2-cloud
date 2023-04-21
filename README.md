@@ -62,7 +62,9 @@ Various cloud providers will be used to deploy the app.
 
 [Railway.app](https://railway.app?referralCode=kanezi) is used as one of the cloud providers to deploy our app.
 
-After provisioning Postgres instance on railway.app following dynamic url can be used to connect spring application to database:
+Railway exposes environment variables (`${{Postgres.*}}`) for database after provisioning Postgres instance.
+
+Dynamic properties can be used to connect spring application to database:
 
 
 | property | value                                                                                     |

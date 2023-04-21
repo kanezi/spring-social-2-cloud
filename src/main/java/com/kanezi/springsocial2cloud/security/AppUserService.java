@@ -4,7 +4,6 @@ import com.kanezi.springsocial2cloud.security.db.AuthorityEntity;
 import com.kanezi.springsocial2cloud.security.db.AuthorityEntityRepository;
 import com.kanezi.springsocial2cloud.security.db.UserEntity;
 import com.kanezi.springsocial2cloud.security.db.UserEntityRepository;
-import jakarta.transaction.Transactional;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +23,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +47,7 @@ public class AppUserService implements UserDetailsManager {
     Executor executor;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userEntityRepository
                 .findById(username)
@@ -127,6 +127,18 @@ public class AppUserService implements UserDetailsManager {
         };
     }
 
+    /**
+     * Saves logged in app user converted from oauth2/oidc login
+     * <p>
+     * Manual call to save user in another thread not to block
+     * We don't use
+     * {@code @Async} because it has two limitations:
+     *     It must be applied to public methods only - so that it can be proxied.
+     *     Self-invocation — calling the async method from within the same class — won't work.
+     *                     — because it bypasses the proxy and calls the underlying method directly
+     *
+     * @param appUser - application user
+     */
     private void saveOauth2User(AppUser appUser) {
         CompletableFuture.runAsync(() -> createUser(appUser), executor);
     }
@@ -230,7 +242,7 @@ public class AppUserService implements UserDetailsManager {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean userExists(String username) {
         return userEntityRepository.existsById(username);
     }

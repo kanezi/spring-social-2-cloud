@@ -16,8 +16,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @Log4j2
 public class SecurityConfiguration {
@@ -48,7 +46,12 @@ public class SecurityConfiguration {
                         .defaultSuccessUrl("/user")
                 )
                 .logout(c -> c.logoutSuccessUrl("/?logout"))
-                .oauth2Login(oc -> oc.loginPage("/login").defaultSuccessUrl("/user").userInfoEndpoint(ui -> ui.userService(oauth2LoginHandler).oidcUserService(oidcLoginHandler)))
+                .oauth2Login(oc -> oc
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/user")
+                        .userInfoEndpoint(ui -> ui
+                                .userService(oauth2LoginHandler)
+                                .oidcUserService(oidcLoginHandler)))
                 .authorizeHttpRequests(c -> c
                         .requestMatchers("/", "/login", "/user/sign-up", "/error").permitAll()
                         .anyRequest().authenticated()

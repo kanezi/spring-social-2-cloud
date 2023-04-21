@@ -17,7 +17,6 @@ class AuthorityEntityRepositoryTest {
     @Autowired
     AuthorityEntityRepository authorityEntityRepository;
 
-
     @Test
     void canQueryByName() {
         authorityEntityRepository.save(new AuthorityEntity("test", LoginProvider.APP));
@@ -30,4 +29,5 @@ class AuthorityEntityRepositoryTest {
             assertThat(ae.getId()).isNotNull();
         });
     }
+
 }
