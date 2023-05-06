@@ -70,6 +70,7 @@
               data-th-action="@{/user/sign-up}"
               data-th-object="${signUpForm}"
               data-th-classappend="${#fields.hasAnyErrors() ? 'error' : ''}"
+              id="sign-up-form"
         >
           <div class="ui segment">
             <div class="field" data-th-classappend="${#fields.hasErrors('username') ? 'error' : ''}">

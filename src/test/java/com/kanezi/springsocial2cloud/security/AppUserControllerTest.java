@@ -1,6 +1,5 @@
 package com.kanezi.springsocial2cloud.security;
 
-import com.kanezi.springsocial2cloud.HomeController;
 import com.kanezi.springsocial2cloud.TestSecurityConfiguration;
 import com.kanezi.springsocial2cloud.security.mock.WithMockAppUser;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = AppUserController.class)

@@ -1,7 +1,7 @@
 package com.kanezi.springsocial2cloud.security;
 
+import com.kanezi.springsocial2cloud.db.CleanUpTestData;
 import com.kanezi.springsocial2cloud.security.mock.WithMockAppUser;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("postgres")
-@Transactional
+@CleanUpTestData
 class AppUserServiceIntegrationTest {
 
     @Autowired
@@ -67,6 +68,7 @@ class AppUserServiceIntegrationTest {
 
     @Test
     @Sql("/db/fixture/dummy_user.sql")
+    @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
     void shouldDeleteUser() {
         assertThat(appUserService.userExists("dummy")).isTrue();
         appUserService.deleteUser("dummy");

@@ -16,14 +16,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = HomeController.class)
-public class HomeControllerTest2 {
+public class HomeControllerOauth2Test {
 
     @Autowired
     MockMvc mockMvc;
 
     @Test
     void oidcUserCanVisitHomePage() throws Exception {
-        mockMvc.perform(get("").with(oidcLogin()))
+        mockMvc.perform(get("")
+                        .with(oidcLogin()))
                 .andExpect(status().isOk());
     }
 
@@ -33,7 +34,8 @@ public class HomeControllerTest2 {
                 Collections.singletonMap("username", "test"),
                 "username");
 
-        mockMvc.perform(get("").with(oauth2Login().oauth2User(oAuth2User)))
+        mockMvc.perform(get("")
+                        .with(oauth2Login().oauth2User(oAuth2User)))
                 .andExpect(status().isOk());
     }
 
