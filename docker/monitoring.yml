@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerting-rules.yml:/etc/prometheus/alerting-rules.yml
+
+  postgres-exporter:
+    image: bitnami/postgres-exporter
+    ports:
+      - 9187:9187
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER:-user}:${DB_PASS:-pass}@host.docker.internal:5432/${DB_SCHEMA:-ss2c}?sslmode=disable"
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+
+
+
+  alertmanager:
+    image: bitnami/alertmanager:latest
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alert-manager/email-alert.yml:/opt/bitnami/alertmanager/conf/config.yml
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - 1025:1025
+      - 8025:8025

@@ -4,6 +4,7 @@ import com.kanezi.springsocial2cloud.security.db.AuthorityEntity;
 import com.kanezi.springsocial2cloud.security.db.AuthorityEntityRepository;
 import com.kanezi.springsocial2cloud.security.db.UserEntity;
 import com.kanezi.springsocial2cloud.security.db.UserEntityRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +46,8 @@ public class AppUserService implements UserDetailsManager {
     AuthorityEntityRepository authorityEntityRepository;
 
     Executor executor;
+
+    MeterRegistry meterRegistry;
 
     @Override
     @Transactional(readOnly = true)
@@ -160,6 +163,8 @@ public class AppUserService implements UserDetailsManager {
         userEntity.mergeAuthorities(authorities);
 
         userEntityRepository.save(userEntity);
+
+        meterRegistry.counter("app-users", "provider", user.getProvider().name()).increment();
 
     }
 
