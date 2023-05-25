@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+     - targets: ["localhost:9090"]
+
+  - job_name: postgres-exporter
+    static_configs:
+     - targets: ["postgres-exporter:9187"]
+
+  - job_name: ss2c
+      # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+    metrics_path: /management/prometheus
+    static_configs:
+      - targets:
+            - host.docker.internal:8080
+
+alerting:
+  alertmanagers:
+    - scheme: http
+      static_configs:
+        - targets: [ 'alertmanager:9093' ]
+
+rule_files:
+    - alerting-rules.yml

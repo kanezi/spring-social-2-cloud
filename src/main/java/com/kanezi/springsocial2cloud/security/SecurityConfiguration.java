@@ -1,6 +1,7 @@
 package com.kanezi.springsocial2cloud.security;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +54,8 @@ public class SecurityConfiguration {
                                 .userService(oauth2LoginHandler)
                                 .oidcUserService(oidcLoginHandler)))
                 .authorizeHttpRequests(c -> c
+                        .requestMatchers(EndpointRequest.to("info", "health", "prometheus")).permitAll()
+                        .requestMatchers(EndpointRequest.toAnyEndpoint().excluding("info", "health", "prometheus")).hasAuthority("manage")
                         .requestMatchers("/", "/login", "/user/sign-up", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
