@@ -1,0 +1,167 @@
+stages:
+  - prepare
+  - test
+  - dockerize
+  - verify
+
+variables:
+  MAVEN_OPTS: >-
+     -Dhttps.protocols=TLSv1.2
+     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+     -Dorg.slf4j.simpleLogger.showDateTime=true
+     -Djava.awt.headless=true
+     -Djgitver.skip=true
+
+  MAVEN_CLI_OPTS: >-
+    --batch-mode
+    --errors
+    --fail-at-end
+    --show-version
+    --no-transfer-progress
+    -DinstallAtEnd=true
+    -DdeployAtEnd=true
+  
+  DOCKER_HUB_IMAGE: $DOCKER_HUB_USER/$CI_PROJECT_NAME
+    
+image: maven:3.9.2-eclipse-temurin-17-alpine
+
+cache:
+  key: $CI_COMMIT_BRANCH
+  paths:
+    - .m2/repository
+
+
+calculate_version_and_cache:
+  stage: prepare
+  script:
+    - mvn $MAVEN_CLI_OPTS clean compile
+    - echo "APP_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" > version.env 
+  artifacts:
+    reports:
+      dotenv: version.env
+
+
+test_with_testcontainers:
+  stage: test
+  variables:
+    # Instruct Testcontainers to use the daemon of DinD, use port 2735 for non-tls connections.
+    DOCKER_HOST: "tcp://docker:2375"
+    # Instruct Docker not to start over TLS.
+    DOCKER_TLS_CERTDIR: ""
+    # Improve performance with overlayfs.
+    DOCKER_DRIVER: overlay2
+    FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
+  services:
+    - name: docker:24.0.2-dind
+      # explicitly disable tls to avoid docker startup interruption
+      command: ["--tls=false"]
+  script:
+    - mvn clean test
+  artifacts:
+    reports:
+      junit: target/surefire-reports/*.xml
+    when: always
+    expire_in: 2 days
+
+
+.dockerize_template:
+  image: docker:24.0.2
+  services:
+    - docker:24.0.2-dind
+  stage: dockerize
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      exists:
+        - "Dockerfile"
+
+
+
+push_docker_image_to_gitlab:
+  extends: .dockerize_template
+  before_script:
+    - echo $CI_JOB_TOKEN | docker login -u gitlab-ci-token $CI_REGISTRY --password-stdin
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        echo "Running on default branch tagging with latest and image tag"
+        docker build -t $CI_REGISTRY_IMAGE:$APP_VERSION -t $CI_REGISTRY_IMAGE:latest .
+      else
+        echo "Running on non default branch"
+        docker build -t $CI_REGISTRY_IMAGE:$APP_VERSION .
+      fi
+    - docker push --all-tags $CI_REGISTRY_IMAGE
+
+
+
+push_to_docker_hub:
+  extends: .dockerize_template
+  before_script:
+    - echo $DOCKER_HUB_ACCESS_TOKEN | docker login -u $DOCKER_HUB_USER --password-stdin
+  script:
+    - docker build -t $DOCKER_HUB_IMAGE -t $DOCKER_HUB_IMAGE:$APP_VERSION .
+    - docker push --all-tags $DOCKER_HUB_IMAGE
+#  only:
+#    - tags
+
+
+
+verify_container_health:
+  image: curlimages/curl
+  stage: verify
+  variables:
+    POSTGRES_DB: "ss2c"
+    POSTGRES_USER: "user"
+    POSTGRES_PASSWORD: "pass"
+    FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
+  services:
+    - name: postgres:13
+      alias: db
+    - name: $CI_REGISTRY_IMAGE:$APP_VERSION
+      alias: app
+      variables:
+        DB_URL: "jdbc:postgresql://db:5432/$POSTGRES_DB"
+        DB_USER: "$POSTGRES_USER"
+        DB_PASS: "$POSTGRES_PASSWORD"
+  needs:
+    - job: calculate_version_and_cache
+      artifacts: true
+    - push_docker_image_to_gitlab
+  script: 
+    - curl "http://app:8080/management/health" | grep "UP"
+
+
+
+verify_docker_hub_container_health:
+  image: curlimages/curl
+  stage: verify
+  variables:
+    POSTGRES_DB: "ss2c"
+    POSTGRES_USER: "user"
+    POSTGRES_PASSWORD: "pass"
+    FF_NETWORK_PER_BUILD: "true"     # activate container-to-container networking
+  services:
+    - name: postgres:13
+      alias: db
+    - name: $DOCKER_HUB_IMAGE:$APP_VERSION
+      alias: app
+      variables:
+        DB_URL: "jdbc:postgresql://db:5432/$POSTGRES_DB"
+        DB_USER: "$POSTGRES_USER"
+        DB_PASS: "$POSTGRES_PASSWORD"
+  needs:
+    - job: calculate_version_and_cache
+      artifacts: true
+    - push_to_docker_hub
+  script: 
+    - curl "http://app:8080/management/health" | grep "UP"
+      
+
+
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Code-Quality.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
+  
