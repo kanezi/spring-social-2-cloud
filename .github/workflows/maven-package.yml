@@ -1,0 +1,14 @@
+name: Java Maven build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  maven_package:
+    uses: ./.github/workflows/maven-package-template.yml
+
+  display_app_version:
+    runs-on: ubuntu-latest
+    needs: maven_package
+    steps:
+      - run: echo ${{ needs.maven_package.outputs.app_version }}

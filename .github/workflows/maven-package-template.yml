@@ -1,0 +1,33 @@
+name: java maven package template
+
+on:
+  workflow_call:
+    outputs:
+      app_version:
+        description: "App version calculated based from JGitVer"
+        value: ${{ jobs.package.outputs.app_version }}
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.calculate_version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # include all history and tags
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      - name: JGitVer calculate app version
+        id: calculate_version
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT
