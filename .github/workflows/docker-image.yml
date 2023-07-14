@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+  release: 
+    types: [created]
+    branches: [main, master]
+    tags: v**
+    
+
+jobs:
+
+  maven_package:
+    uses: ./.github/workflows/maven-package-template.yml
+
+      
+  docker_image:
+    permissions:
+      contents: read
+      packages: write
+    secrets: inherit
+    uses: ./.github/workflows/docker-test-image-template.yml
+    needs: maven_package

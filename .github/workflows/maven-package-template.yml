@@ -1,4 +1,4 @@
-name: java maven package template
+name: Java Maven Package Template
 
 on:
   workflow_call:

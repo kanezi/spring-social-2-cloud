@@ -1,7 +1,11 @@
-name: Java Maven build
+name: Java Maven Package
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    types: [opened, reopened]
 
 jobs:
   maven_package:
