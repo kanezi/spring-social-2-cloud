@@ -4,7 +4,7 @@ services:
     runtime: docker
     region: frankfurt
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /management/health
     envVars:
       - key: SPRING_DATASOURCE_CONNECTION_STRING
         fromDatabase:
@@ -40,7 +40,7 @@ services:
       url: kanezi/spring-social-2-cloud:latest
     region: frankfurt
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /management/health
     envVars:
       - key: SPRING_DATASOURCE_CONNECTION_STRING
         fromDatabase:
