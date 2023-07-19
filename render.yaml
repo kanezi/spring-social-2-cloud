@@ -1,0 +1,76 @@
+services:
+  - type: web
+    name: ss2c-dockerfile
+    runtime: docker
+    region: frankfurt
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_DATASOURCE_CONNECTION_STRING
+        fromDatabase:
+          name: elephant
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: elephant
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: elephant
+          property: password
+      - key: SPRING_DATASOURCE_HOST
+        fromDatabase:
+          name: elephant
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: elephant
+          property: port
+      - key: SPRING_DATASOURCE_SCHEMA
+        fromDatabase:
+          name: elephant
+          property: database
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_SCHEMA}
+
+  - type: web
+    name: ss2c-image
+    runtime: image
+    image:
+      url: kanezi/spring-social-2-cloud:latest
+    region: frankfurt
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_DATASOURCE_CONNECTION_STRING
+        fromDatabase:
+          name: elephant
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: elephant
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: elephant
+          property: password
+      - key: SPRING_DATASOURCE_HOST
+        fromDatabase:
+          name: elephant
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: elephant
+          property: port
+      - key: SPRING_DATASOURCE_SCHEMA
+        fromDatabase:
+          name: elephant
+          property: database
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_SCHEMA}
+
+databases:
+  - name: elephant
+    region: frankfurt
+    plan: free
+
