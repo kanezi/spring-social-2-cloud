@@ -74,3 +74,10 @@ Dynamic properties can be used to connect spring application to database:
 | DB_URL   | ```jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}```|
 
 
+### Render.com
+
+[Render.com](https://render.com) can host docker images, postgres, redis and other services as explained in separate youtube tutorial:
+
+[![IMAGE_ALT](docs/images/render_dot_com.png)](https://youtu.be/WfjsGv5RoGE)
+
+We use ```render.yaml```, infrastructure as code, configuration file in the root of our project to define services we need and how to connect them by using environment variables.
