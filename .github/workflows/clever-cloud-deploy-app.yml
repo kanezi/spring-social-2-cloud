@@ -1,0 +1,19 @@
+name: Deploy clever cloud app
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  deploy_app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: deploy app
+        run: |
+          git fetch --prune --unshallow
+          curl -O https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+          tar xvzf clever-tools-latest_linux.tar.gz
+          ./clever-tools-latest_linux/clever login --token ${{secrets.CLEVER_TOKEN}} --secret ${{secrets.CLEVER_SECRET}}
+          ./clever-tools-latest_linux/clever link ${{secrets.CLEVER_CLOUD_APP_ID}}
+          ./clever-tools-latest_linux/clever deploy -a ${{vars.APP_NAME}}

@@ -1,0 +1,9 @@
+{
+  "build": {
+    "type": "maven",
+    "goal": "package -DskipTests"
+  },
+  "deploy": {
+    "jarName": "./target/*.jar"
+  }
+}

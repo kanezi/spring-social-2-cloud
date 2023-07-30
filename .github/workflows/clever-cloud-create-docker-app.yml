@@ -1,0 +1,41 @@
+name: Creates clever cloud (www.clever-cloud.com) app with database
+run-name: Create Clever Cloud app ${{vars.APP_NAME}} (type ${{inputs.app_type}}) by @${{ github.actor }}
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_type:
+        type: choice
+        description: Application type
+        options:
+          - maven
+          - docker
+      db_name:
+        description: Database name
+        required: true
+        default: db
+      admin_pass:
+        description: Password for admin user
+        required: true
+
+jobs:
+
+  create_app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create app with db
+        run: |
+          echo "creating Clever Cloud application ${{vars.APP_NAME}} with database ${{inputs.db_name}}"
+          git fetch --prune --unshallow
+          curl -O https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+          tar xvzf clever-tools-latest_linux.tar.gz
+          ./clever-tools-latest_linux/clever login --token ${{secrets.CLEVER_TOKEN}} --secret ${{secrets.CLEVER_SECRET}}
+          ./clever-tools-latest_linux/clever create --type ${{inputs.app_type}} ${{vars.APP_NAME}}
+          ./clever-tools-latest_linux/clever addon create postgresql-addon ${{inputs.db_name}} --link ${{vars.APP_NAME}}
+          ./clever-tools-latest_linux/clever env set SPRING_PROFILES_ACTIVE "clever_cloud"
+          ./clever-tools-latest_linux/clever env set ADMIN_PASS ${{inputs.admin_pass}}
+          if [ ${{inputs.app_type}} = 'maven' ]; then
+          	./clever-tools-latest_linux/clever env set CC_JAVA_VERSION "17"
+          fi
